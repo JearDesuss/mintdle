@@ -7,6 +7,8 @@ dist/
 .vercel
 .env*
 
-# caches for the asset tools — resumable intermediates, rebuildable, never shipped
-tools/.cg-cache.json
-tools/.os-slugs.json
+# .cg-cache.json and .os-slugs.json are deliberately NOT ignored: the first is
+# the market-data snapshot data.js was built from (so a rebuild is reproducible
+# rather than re-priced), and the second records which OpenSea slug guesses
+# resolved. Together they save a ~30 minute rate-limited refetch on a fresh
+# clone. They are inputs to a build, not build output.
