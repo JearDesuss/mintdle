@@ -47,6 +47,27 @@ Memedle.
   get "How to play" instead of a dead-end prompt. Add the token and the handle
   gate and daily board switch themselves on.
 
+## Two things NOT done
+
+**Trend research via agent-reach never happened.** The ask was to check trending
+NFTs with agent-reach — the `agent-reach -> opencli` bridge in `~/Developer/lashaun`
+that drives the logged-in Chrome for free X reads. That was misread as a
+generic research subagent, which was spawned instead, and it died on an API
+error without writing anything. So **no X/trend signal informed the roster**.
+The 130 collections were curated from CoinGecko's own catalogue plus known
+blue chips. Running the real bridge could still reshape the list toward what is
+actually hot.
+
+**Vercel git-author trap (from the memescout build, cost 7+ minutes there).**
+Vercel attributes CLI deploys to the git commit author. Commits authored
+`akbarfazar82@gmail.com` are rejected with `TEAM_ACCESS_REQUIRED` when the
+Vercel account is `akbar@sharpbyte.xyz`, and the CLI then hangs on a build that
+never starts. Every commit here is authored `akbarfazar82@gmail.com`. Importing
+through vercel.com/new uses Git integration rather than CLI attribution, so this
+should not bite — but if a deploy hangs past ~30s, this is the first thing to
+check (`vercel deploy --debug`, look for `readyState: BLOCKED`), and the fix is
+`git config user.email` to whatever the target Vercel account uses.
+
 ## Known gaps / possible next work
 
 - `rare-sats` is the only roster entry that never made the deck — CoinGecko
