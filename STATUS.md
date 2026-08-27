@@ -21,11 +21,19 @@ years    2017–2026, peaking at 2021 (44)
 
 ## Next step — the one thing left
 
-Deploy to Vercel **under the jeardesuss account** (this was the chosen option;
-the Vercel CLI on the Mac is logged in as `0xsharpy`, which is the wrong
-account — Memedle is not on it).
+Import this repo at **vercel.com/new**, signed into whichever Vercel account you
+want it on. This was the chosen route: it needs no CLI auth and sets up Git
+auto-deploy in one step.
 
-1. Go to https://vercel.com/new
+What was actually verified on the Mac, so nobody re-litigates it: `vercel
+whoami` is `0xsharpy`, that account has exactly one team (`0xsharpy's
+projects`) holding only `memescout` and `sharpbyte-rwa`, and
+`~/Developer/memedle` has no `.vercel/` link at all. So Memedle was deployed
+from somewhere else, on an account this machine has never signed into. Nothing
+is broken and there is no permission to grant — the credentials just are not
+here.
+
+1. Go to https://vercel.com/new (signed into the account you want)
 2. Import `JearDesuss/mintdle`
 3. Framework preset: **Other**. Build command: none. Output dir: `.`
    (`vercel.json` already sets this; it should be picked up automatically.)
@@ -50,13 +58,25 @@ Memedle.
 ## Two things NOT done
 
 **Trend research via agent-reach never happened.** The ask was to check trending
-NFTs with agent-reach — the `agent-reach -> opencli` bridge in `~/Developer/lashaun`
-that drives the logged-in Chrome for free X reads. That was misread as a
-generic research subagent, which was spawned instead, and it died on an API
-error without writing anything. So **no X/trend signal informed the roster**.
-The 130 collections were curated from CoinGecko's own catalogue plus known
-blue chips. Running the real bridge could still reshape the list toward what is
-actually hot.
+NFTs with agent-reach — which is OpenCLI, installed at
+`~/.npm-global/bin/opencli` (v1.8.7), driving the real Chrome for free X reads.
+It was misread as a generic research subagent; one was spawned, died on an API
+error, and wrote nothing. So **no X/trend signal informed the roster** — the 130
+collections come from CoinGecko's catalogue plus known blue chips.
+
+The bridge is fine, it just needs Chrome open and signed into X; with Chrome
+closed it fails fast with `BROWSER_CONNECT: Browser Bridge extension not
+connected`. To actually do it:
+
+```bash
+export PATH="$HOME/.npm-global/bin:$PATH"
+opencli twitter search "NFT mint" --product live --limit 40 --top-by-engagement 20 -f json
+opencli twitter trending
+```
+
+Then add whatever is hot to `tools/roster.json` + `tools/lore.json` and re-run
+`build-data.js`. Appending is cheap; note that changing the roster's length or
+order reshuffles every future daily, so re-run `tools/schedule.js` after.
 
 **Vercel git-author trap (from the memescout build, cost 7+ minutes there).**
 Vercel attributes CLI deploys to the git commit author. Commits authored
