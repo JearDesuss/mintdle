@@ -2,7 +2,7 @@
 // Each mode has its own fixed seed, so this prints exactly what players get.
 //
 // Usage:
-//   node tools/schedule.js              # next 7 days, all four modes
+//   node tools/schedule.js              # next 7 days, all three modes
 //   node tools/schedule.js 30           # next 30 days
 //   node tools/schedule.js 14 classic   # one mode, with its full stat line
 //   node tools/schedule.js --json 14    # machine-readable
@@ -20,7 +20,7 @@ function mulberry32(a) {
 }
 
 // must match the MODES array in game.js
-const SEEDS = { classic: 0x5EED1337, blur: 0x1D0FBE47, lore: 0x4B19AC03 };
+const SEEDS = { classic: 0x1177EDA1, blur: 0x0FF10012, lore: 0x3A17EDEF };
 const EPOCH = new Date(2026, 7, 27); // must match game.js
 
 // must match fameWeight() in game.js — the better-known collections sort to

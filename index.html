@@ -1,56 +1,115 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Mintdle — daily NFT guessing game</title>
-<meta name="description" content="Guess the NFT collection of the day. Three modes: a clue grid, blurred artwork, one line of provenance. Six guesses each.">
+<title>Mintdle — the daily NFT collection game</title>
+<meta name="description" content="Identify today’s NFT collection in six guesses. Play Classic, Blur, and Lore, then share your collector streak.">
 <meta property="og:title" content="Mintdle">
-<meta property="og:description" content="One NFT collection a day, three ways to guess it. Six guesses each.">
+<meta property="og:description" content="The daily NFT collection game. Three modes. Six guesses.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://mintdle.vercel.app/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Mintdle">
-<meta name="twitter:description" content="One NFT collection a day, three ways to guess it. Six guesses each.">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼</text></svg>">
-<meta name="theme-color" content="#E7E7DD">
+<meta name="twitter:description" content="The daily NFT collection game. Three modes. Six guesses.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%232081e2'/%3E%3Cpath d='M17 43V20h6l9 12 9-12h6v23h-7V31l-8 10-8-10v12z' fill='white'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#07111f">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=f88d0e8e">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=4e521b56">
 </head>
 <body>
 
 <div class="sky" aria-hidden="true"></div>
+<div class="market-noise" aria-hidden="true"></div>
 <canvas id="confetti" aria-hidden="true"></canvas>
 
 <div class="app">
 
   <header class="topbar">
-    <div class="topbar-side left">
-      <span id="streak-pill" class="streak-pill hidden"></span>
-    </div>
     <h1 class="brand" id="brand-slot"></h1>
+    <button class="market-search" id="btn-market-search" aria-label="Jump to collection search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span>Search collections and play</span><kbd>/</kbd>
+    </button>
+    <nav class="exchange-nav" aria-label="Primary navigation">
+      <a href="#/classic" data-mode="classic">Classic</a>
+      <a href="#/blur" data-mode="blur">Blur</a>
+      <a href="#/lore" data-mode="lore">Lore</a>
+      <button data-go="stats">Stats</button>
+      <button data-go="board">Activity</button>
+    </nav>
     <div class="topbar-side right">
+      <span id="streak-pill" class="streak-pill hidden"></span>
       <button class="ico-btn" id="btn-help" title="How to play" aria-label="How to play"><span class="ico">?</span></button>
-      <button class="ico-btn" id="btn-settings" title="Settings" aria-label="Settings"><span class="ico">⚙</span></button>
+      <button class="ico-btn" id="btn-settings" title="Settings" aria-label="Settings">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6Zm8 4.9v-2.2l-2.3-.8a7.1 7.1 0 0 0-.6-1.4l1-2.2-1.6-1.6-2.2 1a7.1 7.1 0 0 0-1.4-.6L12.1 3H9.9l-.8 2.3a7.1 7.1 0 0 0-1.4.6l-2.2-1-1.6 1.6 1 2.2a7.1 7.1 0 0 0-.6 1.4l-2.3.8v2.2l2.3.8c.1.5.3 1 .6 1.4l-1 2.2 1.6 1.6 2.2-1c.4.3.9.5 1.4.6l.8 2.3h2.2l.8-2.3c.5-.1 1-.3 1.4-.6l2.2 1 1.6-1.6-1-2.2c.3-.4.5-.9.6-1.4l2.3-.8Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      </button>
     </div>
   </header>
 
-  <p class="tagline">One NFT collection a day. Six guesses.</p>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow"><span class="live-dot"></span> Featured daily drop</p>
+      <h2 id="hero-title">Discover today’s<br><span>hidden collection.</span></h2>
+      <p class="hero-lede">Search the NFT market from memory. Use collection data, artwork, and lore to find the answer in six guesses.</p>
+      <div class="discover-tabs" aria-label="Puzzle categories">
+        <a class="on" href="#/classic">All clues</a>
+        <a href="#/blur">Artwork</a>
+        <a href="#/lore">Lore</a>
+        <a href="#/classic/unlimited">Endless</a>
+      </div>
+      <div class="hero-facts" aria-label="Game summary">
+        <span><strong>03</strong> game modes</span>
+        <span><strong>06</strong> guesses each</span>
+        <span><strong>24H</strong> next drop</span>
+      </div>
+    </div>
+    <div class="featured-stack" aria-label="Popular collections in the Mintdle deck">
+      <figure class="feature-card feature-main">
+        <img src="img/cryptopunks.img" alt="CryptoPunks collection artwork">
+        <figcaption><strong>CryptoPunks</strong><span>Ethereum · PFP</span></figcaption>
+      </figure>
+      <figure class="feature-card">
+        <img src="img/pudgy-penguins.img" alt="Pudgy Penguins collection artwork">
+        <figcaption><strong>Pudgy Penguins</strong><span>Ethereum · PFP</span></figcaption>
+      </figure>
+      <figure class="feature-card">
+        <img src="img/bored-ape-yacht-club.img" alt="Bored Ape Yacht Club collection artwork">
+        <figcaption><strong>BAYC</strong><span>Ethereum · PFP</span></figcaption>
+      </figure>
+      <figure class="feature-card">
+        <img src="img/azuki.img" alt="Azuki collection artwork">
+        <figcaption><strong>Azuki</strong><span>Ethereum · PFP</span></figcaption>
+      </figure>
+      <figure class="feature-card">
+        <img src="img/milady-maker.img" alt="Milady Maker collection artwork">
+        <figcaption><strong>Milady</strong><span>Ethereum · PFP</span></figcaption>
+      </figure>
+    </div>
+  </section>
 
   <div class="layout">
 
-    <!-- ── left rail: mode switcher ── -->
     <aside class="col col-left">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">Choose your signal</span>
+          <h2>Today’s game modes</h2>
+        </div>
+        <span class="section-note">Fresh collection in every mode</span>
+      </div>
       <nav class="mode-list" id="mode-list" aria-label="Game modes"></nav>
     </aside>
 
-    <!-- ── centre: the live game ── -->
     <main class="col col-mid">
       <section class="panel game-panel">
         <div class="panel-bar">
-          <h2 class="panel-title" id="game-title">Day #1 · Classic</h2>
+          <div>
+            <span class="panel-kicker">Live puzzle</span>
+            <h2 class="panel-title" id="game-title">Day #1 · Classic</h2>
+          </div>
           <span class="panel-badge" id="panel-badge">6/6</span>
         </div>
         <div class="panel-body">
@@ -60,9 +119,14 @@
           <p class="game-meta" id="game-meta"></p>
 
           <div class="input-wrap">
+            <span class="input-search" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            </span>
             <input id="guess-input" type="text" autocomplete="off" autocapitalize="off"
-                   spellcheck="false" placeholder="Type a collection…" aria-label="Guess an NFT collection">
-            <button class="go-btn" id="btn-go" aria-label="Submit guess">→</button>
+                   spellcheck="false" placeholder="Search NFT collections" aria-label="Guess an NFT collection">
+            <button class="go-btn" id="btn-go" aria-label="Submit guess">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 13 0m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
             <div id="ac-list" class="ac-list hidden" role="listbox"></div>
           </div>
 
@@ -76,48 +140,75 @@
       </section>
     </main>
 
-    <!-- ── right rail: yesterday + rules ── -->
     <aside class="col col-right">
-      <section class="panel">
+      <section class="panel side-panel">
         <div class="panel-bar">
-          <h2 class="panel-title">Yesterday</h2>
+          <div>
+            <span class="panel-kicker">Previous drop</span>
+            <h2 class="panel-title">Yesterday</h2>
+          </div>
         </div>
         <div class="panel-body" id="yesterday-body"></div>
       </section>
 
-      <section class="panel">
+      <section class="panel side-panel rules-panel">
         <div class="panel-bar">
-          <h2 class="panel-title">How to play</h2>
+          <div>
+            <span class="panel-kicker">Quick start</span>
+            <h2 class="panel-title">How to play</h2>
+          </div>
         </div>
         <div class="panel-body">
           <ul class="rule-list">
-            <li><span class="tick" aria-hidden="true"></span> Six guesses a day</li>
-            <li><span class="tick" aria-hidden="true"></span> Three modes, three collections</li>
-            <li><span class="tick" aria-hidden="true"></span> Miss a day, lose the streak</li>
+            <li><span class="tick" aria-hidden="true">1</span><span>Make up to six guesses</span></li>
+            <li><span class="tick" aria-hidden="true">2</span><span>Use the feedback or revealed clues</span></li>
+            <li><span class="tick" aria-hidden="true">3</span><span>Return tomorrow to keep the streak</span></li>
           </ul>
-          <button class="degen-chip" id="btn-help-2">The long version</button>
+          <button class="degen-chip" id="btn-help-2">View all rules <span aria-hidden="true">→</span></button>
         </div>
       </section>
     </aside>
   </div>
 
-  <!-- ── keep playing ── -->
   <section class="more">
-    <h2 class="more-title">Keep playing</h2>
+    <div class="more-heading">
+      <div>
+        <span class="section-kicker">Collector hub</span>
+        <h2 class="more-title">Keep playing</h2>
+      </div>
+      <p>Switch modes, revisit an older drop, or compare today’s score.</p>
+    </div>
     <div class="pill-row" id="pill-row"></div>
     <p class="text-links">
       <button data-go="stats">Stats</button><span>·</span>
       <button data-go="board">Leaderboard</button><span>·</span>
-      <a href="https://www.coingecko.com/en/nft" target="_blank" rel="noopener">Data</a>
+      <a href="https://www.coingecko.com/en/nft" target="_blank" rel="noopener">Market data</a>
     </p>
     <div class="social-row" id="social-row"></div>
     <p class="fineprint">An unofficial fan game · collection data via CoinGecko · floors are approximate</p>
   </section>
 
-</div><!-- /.app -->
+</div>
 
-<!-- the hang: real collection art, framed and dealt along the wall. Scenery. -->
 <div class="ground-layer" aria-hidden="true">
+  <div class="popular-wall">
+    <figure class="popular-card"><img src="img/cryptopunks.img" alt=""><figcaption><b>CryptoPunks</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/bored-ape-yacht-club.img" alt=""><figcaption><b>BAYC</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/pudgy-penguins.img" alt=""><figcaption><b>Pudgy Penguins</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/azuki.img" alt=""><figcaption><b>Azuki</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/milady-maker.img" alt=""><figcaption><b>Milady</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/doodles-official.img" alt=""><figcaption><b>Doodles</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/moonbirds.img" alt=""><figcaption><b>Moonbirds</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/degods.img" alt=""><figcaption><b>DeGods</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/clonex.img" alt=""><figcaption><b>CloneX</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/meebits.img" alt=""><figcaption><b>Meebits</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/world-of-women.img" alt=""><figcaption><b>World of Women</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/mfers.img" alt=""><figcaption><b>mfers</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/sappy-seals.img" alt=""><figcaption><b>Sappy Seals</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/redacted-remilio-babies.img" alt=""><figcaption><b>Remilio</b><span>ETH</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/chromie-squiggle-by-snowfro.img" alt=""><figcaption><b>Chromie Squiggle</b><span>ART</span></figcaption></figure>
+    <figure class="popular-card"><img src="img/fidenza-by-tyler-hobbs.img" alt=""><figcaption><b>Fidenza</b><span>ART</span></figcaption></figure>
+  </div>
   <div class="crowd" id="crowd">
     <div class="crowd-row" data-band="0"></div>
     <div class="crowd-row" data-band="1"></div>
@@ -129,17 +220,18 @@
 <!-- ===================== MODALS ===================== -->
 <div id="modal-help" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="help-h">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <span class="modal-kicker">Game guide</span>
     <h2 id="help-h">How to play</h2>
-    <p>A new collection every day in <strong>all three modes</strong>. Six guesses each. Miss a day and the streak dies.</p>
+    <p>A new collection drops every day in <strong>all three modes</strong>. You get six guesses in each. Miss a day and the streak resets.</p>
     <div id="help-modes" class="help-modes"></div>
     <h3>Classic feedback</h3>
     <ul class="help-list">
-      <li><strong>Chain</strong> — where it lives. <span class="chip cy">Yellow</span> means both are EVM chains.</li>
-      <li><strong>Class</strong> — what the collection is: PFP, art, onchain, gaming… <span class="chip cy">Yellow</span> means same family.</li>
-      <li><strong>Year</strong> — the mint year. <span class="chip cy">Yellow</span> is within one year. ▲▼ point at the answer.</li>
-      <li><strong>Supply</strong> — how many items, by range (&le;100 · 100+ · 1K+ · 5K+ · 10K+).</li>
-      <li><strong>Floor</strong> — floor price today, by range (&lt;0.01Ξ · 0.01Ξ+ · 0.1Ξ+ · 1Ξ+ · 10Ξ+).</li>
+      <li><strong>Chain</strong> — where it lives. <span class="chip cy">Close</span> means both are EVM chains.</li>
+      <li><strong>Class</strong> — PFP, art, onchain, gaming, and more. <span class="chip cy">Close</span> means the same family.</li>
+      <li><strong>Year</strong> — the mint year. <span class="chip cy">Close</span> is within one year. ▲▼ point toward the answer.</li>
+      <li><strong>Supply</strong> — item count by range (≤100 · 100+ · 1K+ · 5K+ · 10K+).</li>
+      <li><strong>Floor</strong> — current floor by range (&lt;0.01Ξ · 0.01Ξ+ · 0.1Ξ+ · 1Ξ+ · 10Ξ+).</li>
     </ul>
     <div class="help-demo">
       <div class="tile s-g demo"><span class="tile-val">Ethereum</span></div>
@@ -153,20 +245,22 @@
 
 <div id="modal-settings" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="set-h">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <span class="modal-kicker">Your space</span>
     <h2 id="set-h">Settings</h2>
     <h3>Your handle</h3>
     <div id="profile-body" class="profile-body"></div>
     <label class="cb-row"><input type="checkbox" id="cb-toggle-2"> High-contrast tiles (blue / orange)</label>
     <h3>Danger zone</h3>
-    <p class="fine">Wipes today's progress, your streak and every stat on this device. Your handle stays yours.</p>
+    <p class="fine">Wipes today’s progress, your streak, and every stat on this device. Your handle stays yours.</p>
     <button class="btn btn-danger" id="btn-wipe">Erase my record</button>
   </div>
 </div>
 
 <div id="modal-stats" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="stats-h">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <span class="modal-kicker">Collector profile</span>
     <h2 id="stats-h">Your record</h2>
     <div class="stat-tabs" id="stat-tabs"></div>
     <div class="stat-grid">
@@ -182,22 +276,24 @@
 
 <div id="modal-archive" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="arch-h">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <span class="modal-kicker">Past drops</span>
     <h2 id="arch-h">Archive</h2>
-    <p class="fine">Every puzzle you've missed. Playing one won't touch your streak.</p>
+    <p class="fine">Every puzzle you’ve missed. Playing one won’t touch your streak.</p>
     <div id="archive-body" class="archive-body"></div>
   </div>
 </div>
 
 <div id="modal-reveal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
     <div id="reveal-body"></div>
   </div>
 </div>
 
 <div id="modal-gate" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="gate-h">
   <div class="modal">
+    <span class="modal-kicker">Join the board</span>
     <h2 id="gate-h">Pick a handle</h2>
     <div id="gate-body"></div>
   </div>
@@ -205,7 +301,8 @@
 
 <div id="modal-lb" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lb-h">
   <div class="modal">
-    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <button class="modal-close" data-close aria-label="Close">×</button>
+    <span class="modal-kicker">Daily rankings</span>
     <h2 id="lb-h">Leaderboard</h2>
     <div id="lb-body"></div>
   </div>
@@ -213,10 +310,10 @@
 
 <div class="flash-layer" id="flash-layer" aria-live="polite"></div>
 
-<script src="data.js?v=f88d0e8e"></script>
-<script src="art.js?v=f88d0e8e"></script>
-<script src="lb.js?v=f88d0e8e"></script>
-<script src="share.js?v=f88d0e8e"></script>
-<script src="game.js?v=f88d0e8e"></script>
+<script src="data.js?v=4e521b56"></script>
+<script src="art.js?v=4e521b56"></script>
+<script src="lb.js?v=4e521b56"></script>
+<script src="share.js?v=4e521b56"></script>
+<script src="game.js?v=4e521b56"></script>
 </body>
 </html>

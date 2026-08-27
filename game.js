@@ -247,10 +247,12 @@
     var ch = (key || "?").charAt(0).toUpperCase();
     var svg =
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
-      '<rect width="64" height="64" fill="#F2F2EC"/>' +
-      '<rect x="5.5" y="5.5" width="53" height="53" fill="none" stroke="#D8DAD2"/>' +
+      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop stop-color="#1A2C46"/><stop offset="1" stop-color="#0A1627"/></linearGradient></defs>' +
+      '<rect width="64" height="64" rx="13" fill="url(#g)"/>' +
+      '<rect x="5.5" y="5.5" width="53" height="53" rx="10" fill="none" stroke="#31445F"/>' +
       '<text x="32" y="42" text-anchor="middle" font-family="ui-monospace,monospace" ' +
-      'font-weight="700" font-size="24" fill="#B6BCC6">' + ch + "</text></svg>";
+      'font-weight="700" font-size="24" fill="#6BDCFF">' + ch + "</text></svg>";
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
   function artFile(key) { return (typeof ART !== "undefined" && ART[key]) || null; }
@@ -272,21 +274,18 @@
     return img;
   }
 
-  // ──────────────── brand: flat wordmark, one hard offset ────────────────
-  // Memedle extrudes its wordmark through nine gradient slabs. That is a
-  // sticker effect, and DESIGN.md allows no gradient outside the wall — so this
-  // is the system's own elevation applied to type: a Graphite copy dropped by
-  // exactly --hang, and a flat Cobalt face sitting on it.
+  // ──────────────── brand: marketplace portal + wordmark ────────────────
   function brandSVG(sfx) {
-    function line(y, fill) {
-      return '<text x="280" y="' + y + '" text-anchor="middle" ' +
-        'font-family="Archivo Black, Arial Black, sans-serif" font-size="92" ' +
-        'letter-spacing="-3.4" fill="' + fill + '">MINTDLE</text>';
-    }
-    return '<svg viewBox="0 0 560 130" role="img" aria-label="Mintdle"><g>' +
-      line(97, "#16181D") +
-      line(92, "#2E4BF0") +
-      "</g></svg>";
+    return '<svg viewBox="0 0 420 96" role="img" aria-label="Mintdle">' +
+      '<defs><linearGradient id="mintdle-mark-' + sfx + '" x1="0" y1="0" x2="1" y2="1">' +
+      '<stop stop-color="#6BDCFF"/><stop offset=".48" stop-color="#2081E2"/>' +
+      '<stop offset="1" stop-color="#9B7BFF"/></linearGradient></defs>' +
+      '<rect x="4" y="14" width="66" height="66" rx="19" fill="url(#mintdle-mark-' + sfx + ')"/>' +
+      '<rect x="13" y="23" width="48" height="48" rx="13" fill="#0A1627" fill-opacity=".9"/>' +
+      '<path d="M22 60V34h7l8 11 8-11h7v26h-8V47l-7 9-7-9v13z" fill="#F7FAFF"/>' +
+      '<text x="84" y="64" font-family="Inter,Segoe UI,sans-serif" font-size="48" ' +
+      'font-weight="800" letter-spacing="-2.4" fill="#F7FAFF">mintdle</text>' +
+      '<circle cx="393" cy="30" r="5" fill="#35D39A"/></svg>';
   }
 
   // ──────────────── clouds: outlined pixel blocks ────────────────
@@ -301,12 +300,20 @@
   function artList() {
     if (typeof ART === "undefined") return [];
     var keys = Object.keys(ART);
+    var popular = [
+      "cryptopunks", "bored-ape-yacht-club", "pudgy-penguins", "azuki",
+      "milady-maker", "doodles-official", "moonbirds", "degods", "clonex",
+      "meebits", "world-of-women", "mfers", "sappy-seals",
+      "redacted-remilio-babies", "chromie-squiggle-by-snowfro",
+      "fidenza-by-tyler-hobbs"
+    ].filter(function (key) { return !!ART[key]; });
+    keys = keys.filter(function (key) { return popular.indexOf(key) === -1; });
     var rnd = mulberry32(0x120573);
     for (var i = keys.length - 1; i > 0; i--) {
       var j = Math.floor(rnd() * (i + 1));
       var t = keys[i]; keys[i] = keys[j]; keys[j] = t;
     }
-    return keys;
+    return popular.concat(keys);
   }
   function artImg(key, h) {
     var img = document.createElement("img");
@@ -406,6 +413,9 @@
       }
       var pct = st ? Math.round(100 * Math.min(st.n, MAX_GUESSES) / MAX_GUESSES) : 0;
       c.fill.style.width = (st && st.done && st.won ? 100 : pct) + "%";
+    });
+    Array.prototype.forEach.call(document.querySelectorAll(".exchange-nav [data-mode]"), function (link) {
+      link.classList.toggle("on", link.getAttribute("data-mode") === modeId);
     });
   }
 
@@ -511,8 +521,7 @@
       // classic has no image to show, so the panel gets the mystery item
       stage.classList.add("burst");
       if (done) {
-        var solved = logoImg(target, "");
-        solved.style.cssText = "position:relative;width:108px;height:108px;border-radius:50%;border:5px solid var(--ink);object-fit:cover";
+        var solved = logoImg(target, "stage-solved-art");
         stage.appendChild(solved);
         stage.appendChild(el("div", "stage-cap", won ? "Called it." : "It was " + target.n + "."));
       } else {
@@ -1211,6 +1220,12 @@
     renderHelpModes(); renderSocial();
 
     var input = $("guess-input");
+    function jumpToSearch() {
+      input.scrollIntoView({ behavior: reducedMotion() ? "auto" : "smooth", block: "center" });
+      setTimeout(function () { input.focus(); }, reducedMotion() ? 0 : 280);
+    }
+    var marketSearch = $("btn-market-search");
+    if (marketSearch) marketSearch.addEventListener("click", jumpToSearch);
     input.addEventListener("input", function () { acIndex = -1; renderAC(); });
     input.addEventListener("keydown", function (ev) {
       var m = acMatches(input.value);
@@ -1242,7 +1257,13 @@
     Array.prototype.forEach.call(document.querySelectorAll(".modal-backdrop"), function (m) {
       m.addEventListener("click", function (ev) { if (ev.target === m) closeModals(); });
     });
-    document.addEventListener("keydown", function (ev) { if (ev.key === "Escape") closeModals(); });
+    document.addEventListener("keydown", function (ev) {
+      if (ev.key === "Escape") closeModals();
+      if (ev.key === "/" && !/^(INPUT|TEXTAREA)$/.test(document.activeElement && document.activeElement.tagName)) {
+        ev.preventDefault();
+        jumpToSearch();
+      }
+    });
 
     bindToggle($("cb-toggle"), "cb", "mt_cb");
     bindToggle($("cb-toggle-2"), "cb", "mt_cb");

@@ -19,28 +19,29 @@ var SHARE = (function () {
 
   var W = 1200, H = 675;
 
-  // The page's tokens, at print scale. Same ramp, same status hues, same rule.
+  // The page's midnight-market tokens, at print scale.
   var C = {
-    ink: "#16181D",   // Graphite
-    ink2: "#4A4F5A",  // Slate
-    paper: "#F2F2EC", // Board
-    card: "#E8E9E1",  // Mat
-    rind: "#D8DAD2",  // Rule — the mat line
-    ash: "#B6BCC6",
-    gold: "#2E4BF0",  // Cobalt: the accent slot, whatever it is called
-    sky1: "#E7E7DD",  // the wall, top
-    sky2: "#D3D3C7",  // the wall, below the rail
-    bull: "#2E9E5B",
-    warn: "#E0A32B",
-    bear: "#DC3B3B"
+    ink: "#F7FAFF",
+    ink2: "#94A7C1",
+    paper: "#0E1C30",
+    card: "#14243B",
+    rind: "#31445F",
+    ash: "#667B99",
+    gold: "#2081E2",
+    sky1: "#07111F",
+    sky2: "#0B1830",
+    shadow: "#020813",
+    bull: "#35D39A",
+    warn: "#F1B84B",
+    bear: "#EF6178"
   };
   var CB = { bull: "#2F6FD0", bear: "#D9721B" };
 
-  var CUT = 6;        // the frame rule, at card scale
-  var CUT_IN = 3;
-  var LIFT = 10;      // the hang
-  var R_CARD = 4;     // --r-2 at print scale
-  var R_TILE = 0;     // --r-1 is zero. Nothing here is round.
+  var CUT = 2;
+  var CUT_IN = 2;
+  var LIFT = 0;
+  var R_CARD = 28;
+  var R_TILE = 12;
 
   function statusColor(s, cb) {
     if (s === "g") return cb ? CB.bull : C.bull;
@@ -59,21 +60,24 @@ var SHARE = (function () {
     ctx.arcTo(x, y, x + w, y, r);
     ctx.closePath();
   }
-  // A plate: flat fill, one hard Graphite offset, zero blur. The page's whole
-  // elevation system is this function.
   function sticker(ctx, x, y, w, h, r, fill, cut, lift) {
     cut = cut == null ? CUT : cut;
     lift = lift == null ? LIFT : lift;
     if (lift) {
-      ctx.fillStyle = C.ink;
+      ctx.fillStyle = C.shadow;
       rr(ctx, x, y + lift, w, h, r);
       ctx.fill();
     }
+    ctx.save();
+    ctx.shadowColor = "rgba(0,0,0,.34)";
+    ctx.shadowBlur = 26;
+    ctx.shadowOffsetY = 12;
     ctx.fillStyle = fill;
     rr(ctx, x, y, w, h, r);
     ctx.fill();
+    ctx.restore();
     if (cut) {
-      ctx.strokeStyle = C.ink;
+      ctx.strokeStyle = C.rind;
       ctx.lineWidth = cut;
       rr(ctx, x + cut / 2, y + cut / 2, w - cut, h - cut, Math.max(1, r - cut / 2));
       ctx.stroke();
@@ -87,25 +91,14 @@ var SHARE = (function () {
     ctx.fillText(str, x, y);
   }
 
-  // The wordmark is extruded by stacking the same glyphs down one pixel at a
-  // time, exactly like the SVG on the page — not by faking a shadow.
   function wordmark(ctx, x, y, size) {
-    var depth = Math.round(size * 0.16);
-    ctx.font = "400 " + size + 'px "Archivo Black", "Arial Black", system-ui, sans-serif';
+    ctx.font = "800 " + size + 'px "Inter", "Segoe UI", system-ui, sans-serif';
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.lineJoin = "round";
-    // One hard drop at exactly the hang — not an extrusion. Memedle stacks
-    // `depth` copies to fake a 3D slab; this system's elevation is a single
-    // zero-blur offset, and the card has to match the page.
-    ctx.fillStyle = C.ink;
-    ctx.fillText("MINTDLE", x, y + Math.max(3, Math.round(depth * 0.6)));
-    ctx.strokeStyle = C.ink;
-    ctx.lineWidth = Math.max(4, size * 0.11);
-    ctx.strokeText("MINTDLE", x, y);
     ctx.fillStyle = C.gold;
-    ctx.fillText("MINTDLE", x, y);
-    return ctx.measureText("MINTDLE").width;
+    ctx.fillText("mintdle", x, y);
+    return ctx.measureText("mintdle").width;
   }
 
   // ── fonts ───────────────────────────────────────────────────────────────
@@ -117,13 +110,13 @@ var SHARE = (function () {
     fontsReady = (function () {
       if (!document.fonts || !document.fonts.load) return Promise.resolve();
       var want = [
-        '400 92px "Archivo Black"',
+        '800 92px "Inter"',
         '700 32px "Space Mono"',
-        '700 42px "Space Grotesk"',
-        '400 26px "Space Grotesk"'
+        '700 42px "Inter"',
+        '400 26px "Inter"'
       ];
       return Promise.all(want.map(function (f) {
-        return document.fonts.load(f, "MEMEDLE 0123456789").catch(function () {});
+        return document.fonts.load(f, "MINTDLE 0123456789").catch(function () {});
       })).then(function () { return document.fonts.ready; }).catch(function () {});
     })();
     return fontsReady;
@@ -160,16 +153,16 @@ var SHARE = (function () {
 
     // ── the score, as a badge on the right ──
     var score = (st.won ? st.guesses : "X") + "/" + st.max;
-    ctx.font = '700 50px "Space Grotesk", "Segoe UI", system-ui, sans-serif';
+    ctx.font = '700 50px "Inter", "Segoe UI", system-ui, sans-serif';
     var sw = Math.max(132, ctx.measureText(score).width + 56);
     var sx = px + pw - 52 - sw;
     sticker(ctx, sx, top + 2, sw, 76, R_TILE, st.won ? C.gold : C.card, CUT_IN, 5);
     text(ctx, score, sx + sw / 2, top + 58,
-      '700 50px "Space Grotesk", "Segoe UI", system-ui, sans-serif', C.ink, "center");
+      '700 50px "Inter", "Segoe UI", system-ui, sans-serif', C.ink, "center");
 
     if (st.blurb) {
       text(ctx, st.blurb, padX, top + 106,
-        '400 27px "Space Grotesk", "Segoe UI", system-ui, sans-serif', C.ink2);
+        '400 27px "Inter", "Segoe UI", system-ui, sans-serif', C.ink2);
     }
 
     // ── the grid ──
@@ -187,14 +180,14 @@ var SHARE = (function () {
     ctx.stroke();
 
     text(ctx, st.url, padX, footY,
-      '700 30px "Space Grotesk", "Segoe UI", system-ui, sans-serif', C.ink);
+      '700 30px "Inter", "Segoe UI", system-ui, sans-serif', C.ink);
 
     var right = [];
     if (st.hint) right.push("hint spent");
     if (st.streak > 1) right.push(st.streak + " day streak");
     if (right.length) {
       text(ctx, right.join("  ·  "), px + pw - 52, footY,
-        '400 27px "Space Grotesk", "Segoe UI", system-ui, sans-serif', C.ink2, "right");
+        '400 27px "Inter", "Segoe UI", system-ui, sans-serif', C.ink2, "right");
     }
   }
 
