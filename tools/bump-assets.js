@@ -15,14 +15,15 @@ const crypto = require("crypto");
 
 const ROOT = path.join(__dirname, "..");
 const INDEX = path.join(ROOT, "index.html");
+// Every locally-served file index.html carries a ?v= on. The wall is CSS, so
+// unlike Memedle there is no backdrop image in this list.
 const ASSETS = [
   "style.css",
   "data.js",
-  "logos.js",
+  "art.js",
   "lb.js",
   "share.js",
   "game.js",
-  "img/memedle-mascot-horizon-v2.webp",
 ];
 
 const args = process.argv.slice(2);

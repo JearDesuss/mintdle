@@ -233,7 +233,7 @@ a { color: inherit; }
 .topbar-side.right { justify-content: flex-end; }
 
 .brand { width: 100%; max-width: 430px; line-height: 0; }
-.brand svg { width: 100%; height: auto; display: block; overflow: visible; }
+.brand svg { width: 100%; height: auto; display: block; }
 
 .streak-pill {
   display: inline-flex; align-items: center; gap: 6px;
@@ -371,12 +371,20 @@ a { color: inherit; }
 }
 .mode-card.on::before { transform: scaleY(1); }
 
+/* ── the mat ──
+   A picture is mounted, not merely outlined: padding on the img draws Board
+   between the artwork and its Graphite rule, which is a real mat rather than a
+   second border. This is the one structural idea Memedle's sticker system does
+   not have, and it belongs to artwork frames — a mat around a text panel would
+   be decoration. Applied at three sizes: 4px on the large frames, 3px on the
+   rail, 2px where the frame is under 32px and a wider mat would eat the art. */
 .mode-ico {
-  width: 44px; height: 44px;
+  width: 46px; height: 46px;
+  padding: 3px;
   border-radius: var(--r-1);
   border: var(--rule-in) solid var(--graphite);
   object-fit: cover;
-  background: var(--mat);
+  background: var(--board);
   flex: none;
 }
 .mode-text { min-width: 0; }
@@ -461,10 +469,11 @@ a { color: inherit; }
 
 .blur-frame {
   position: relative;
-  width: 150px; height: 150px;
+  width: 164px; height: 164px;
+  padding: 4px;
   border-radius: var(--r-1);
   overflow: hidden;
-  background: #fff;
+  background: var(--board);
   border: var(--rule) solid var(--graphite);
   box-shadow: var(--shadow);
 }
@@ -531,7 +540,7 @@ a { color: inherit; }
 }
 .ac-item:last-child { border-bottom: none; }
 .ac-item.active, .ac-item:hover { background: var(--cobalt); }
-.ac-art { width: 28px; height: 28px; border-radius: var(--r-1); flex: none; border: var(--rule-in) solid var(--graphite); object-fit: cover; }
+.ac-art { width: 30px; height: 30px; padding: 2px; background: var(--board); border-radius: var(--r-1); flex: none; border: var(--rule-in) solid var(--graphite); object-fit: cover; }
 .ac-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; }
 .ac-chain { flex: none; font-size: 12.5px; color: var(--slate); }
 
@@ -592,7 +601,7 @@ a { color: inherit; }
 .guess-row { align-items: stretch; }
 
 .item-label { display: flex; align-items: center; gap: 6px; min-width: 0; }
-.item-art { width: 30px; height: 30px; border-radius: var(--r-1); flex: none; border: var(--rule-in) solid var(--graphite); object-fit: cover; }
+.item-art { width: 32px; height: 32px; padding: 2px; background: var(--board); border-radius: var(--r-1); flex: none; border: var(--rule-in) solid var(--graphite); object-fit: cover; }
 .item-label-text { display: flex; flex-direction: column; min-width: 0; }
 .item-title { font-size: 11.5px; font-weight: 700; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .item-sub { font-size: 10px; color: var(--fog); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -958,7 +967,7 @@ a { color: inherit; }
 .reveal-sub { text-align: center; font-size: 14px; color: var(--slate); margin-bottom: 14px; }
 .item-card { padding: 13px; border-radius: var(--r-1); background: var(--lit); border: var(--rule-in) solid var(--graphite); }
 .item-card-title { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-.item-card-art { width: 52px; height: 52px; border-radius: var(--r-1); flex: none; border: var(--rule) solid var(--graphite); object-fit: cover; }
+.item-card-art { width: 58px; height: 58px; padding: 4px; background: var(--board); border-radius: var(--r-1); flex: none; border: var(--rule) solid var(--graphite); object-fit: cover; }
 .item-card-title-text { display: flex; flex-direction: column; min-width: 0; }
 .item-card-name { font-family: var(--font-ui); font-weight: 800; font-size: 17px; line-height: 1.3; overflow-wrap: anywhere; }
 .item-card-sub { font-size: 13px; color: var(--slate); }
@@ -1244,21 +1253,23 @@ a.lb-player.linked { text-decoration: underline; text-underline-offset: 3px; }
      panels to content width once they stack */
   .col-right { order: 3; flex-direction: column; align-items: stretch; }
   .topbar { grid-template-columns: auto 1fr auto; }
-  .brand { max-width: 300px; }
+  .brand { max-width: 240px; }
   .streak-pill { font-size: 10px; padding: 5px 9px; }
   .ico-btn { width: 38px; height: 38px; }
-  .tagline { font-size: 17px; margin-bottom: 14px; }
+  .tagline { font-size: 10px; letter-spacing: .07em; margin-bottom: 14px; }
   .mode-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .mode-card {
     grid-template-columns: 1fr auto;
-    gap: 5px;
-    padding: 8px 8px 8px 16px;
+    gap: 4px;
+    padding: 8px 6px 8px 12px;
     border-width: var(--rule-in);
     box-shadow: var(--shadow-card);
   }
   .mode-ico, .mode-blurb, .mode-prog { display: none; }
-  .mode-name { font-size: 16px; }
-  .mode-flag { min-width: 30px; height: 24px; padding: 0 4px; border-width: var(--rule-in); font-size: 11px; }
+  /* "CLASSIC" is the longest mode name and the three chips split the width
+     evenly, so this size is set by that word fitting, not by taste */
+  .mode-name { font-size: 13px; letter-spacing: 0; }
+  .mode-flag { min-width: 29px; height: 23px; padding: 0 3px; border-width: var(--rule-in); font-size: 10.5px; }
   .more { width: 100%; margin-top: 18px; padding: 14px 12px 16px; border-radius: var(--r-2); }
   .crowd { height: 116px; margin-bottom: -5px; }
   .crowd-row[data-band="0"] { bottom: 52px; }

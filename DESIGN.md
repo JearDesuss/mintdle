@@ -177,16 +177,30 @@ both scenery: the wall's corner vignette and the modal backdrop scrim.
 No inner shadows. No bevels. No `to bottom` gradient on any control. Fills are
 flat. Gradients exist only in the wall.
 
-## the mat line
+## the mat
 
-The one structural idea Memedle does not have. Every plate carries its 3px
-Graphite rule *and* a 1px Rule-coloured line inset from it by 3px, drawn with
-`outline` + `outline-offset` on an inner element. That double edge is what makes
-a panel read as *framed* rather than merely outlined, and it is the cheapest
-possible way to say "gallery" without adding a colour, a shadow or an image.
+The one structural idea Memedle's sticker system does not have, and the reason a
+thumbnail here reads as *mounted* rather than merely outlined.
 
-It appears on plates only. A tile, a chip or a pip is a mark printed on a plate,
-not a plate itself, so it gets `rule-in` and no mat.
+Every artwork frame carries padding in Board between the picture and its
+Graphite rule. That is a real mat — the image's own box is inset from the frame
+— not a second border pretending to be one. It costs no colour, no shadow and
+no image, and it is the whole of what makes the page say "gallery".
+
+Three sizes, set by how much art there is to protect:
+
+| where | mat |
+|---|---|
+| `.blur-frame`, `.item-card-art`, the hung plates | 4px |
+| `.mode-ico` | 3px |
+| `.item-art`, `.ac-art` — any frame under 32px | 2px |
+
+**A mat goes around a picture, and only around a picture.** A panel of text with
+a line set inside its frame is decoration wearing the mat's clothes; the panels
+carry their Graphite rule alone. The one non-artwork exception is `.mystery`,
+the unhung plate, which draws its mat as a `::after` because there is no image
+inside it to pad — it is a frame with nothing in it yet, and the mat is what
+says so.
 
 ## layout
 

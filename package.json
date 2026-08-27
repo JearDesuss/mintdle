@@ -1,0 +1,16 @@
+{
+  "name": "mintdle",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mintdle — a daily NFT collection guessing game. A static page plus four serverless functions for handles and the board.",
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
+  },
+  "scripts": {
+    "test": "node test/cdp-test.js",
+    "stamp": "node tools/bump-assets.js",
+    "data": "node tools/fetch-collections.js && node tools/fetch-art.js --missing && node tools/build-data.js",
+    "schedule": "node tools/schedule.js"
+  }
+}

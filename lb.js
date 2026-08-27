@@ -452,11 +452,34 @@ var LB = (function () {
   // ── boot ────────────────────────────────────────────────────────────────
   // Runs after the game has drawn itself, so the page behind the gate is the
   // real board rather than an empty panel.
+  // The handle gate only makes sense if there is a board to join. A deployment
+  // without BLOB_READ_WRITE_TOKEN answers 503, and a static host has no /api at
+  // all — in both cases prompting a first-time player for a handle they cannot
+  // claim is a dead end on the one screen that should just let them play. So
+  // probe once, and gate only if something answers.
+  var boardUp = null;
+  function probe() {
+    if (boardUp !== null) return Promise.resolve(boardUp);
+    return api("/name?name=__probe__").then(function (r) {
+      boardUp = r._status !== 503 && r._status !== 0 && r._status !== 404;
+      return boardUp;
+    }, function () { boardUp = false; return boardUp; });
+  }
+  function boardAvailable() { return boardUp !== false; }
+
   function boot(afterGate) {
     cid();
     renderProfile();
     if (hasName()) { flushQueue(); if (afterGate) afterGate(); return; }
-    openGate(afterGate, true);
+    var done = false;
+    function go(up) {
+      if (done) return; done = true;
+      if (up) openGate(afterGate, true);
+      else if (afterGate) afterGate();
+    }
+    // never let a slow or hanging probe hold up the first screen
+    setTimeout(function () { go(false); }, 3500);
+    probe().then(go, function () { go(false); });
   }
 
   return {
@@ -469,6 +492,7 @@ var LB = (function () {
     name: name,
     xHandle: xHandle,
     hasName: hasName,
+    boardAvailable: boardAvailable,
     flash: flash
   };
 })();
