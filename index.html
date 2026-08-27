@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mintdle — daily NFT guessing game</title>
+<meta name="description" content="Guess the NFT collection of the day. Three modes: a clue grid, blurred artwork, one line of provenance. Six guesses each.">
+<meta property="og:title" content="Mintdle">
+<meta property="og:description" content="One NFT collection a day, three ways to guess it. Six guesses each.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mintdle.vercel.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Mintdle">
+<meta name="twitter:description" content="One NFT collection a day, three ways to guess it. Six guesses each.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖼</text></svg>">
+<meta name="theme-color" content="#E7E7DD">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=c1edb881">
+</head>
+<body>
+
+<div class="sky" aria-hidden="true"></div>
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-side left">
+      <span id="streak-pill" class="streak-pill hidden"></span>
+    </div>
+    <h1 class="brand" id="brand-slot"></h1>
+    <div class="topbar-side right">
+      <button class="ico-btn" id="btn-help" title="How to play" aria-label="How to play"><span class="ico">?</span></button>
+      <button class="ico-btn" id="btn-settings" title="Settings" aria-label="Settings"><span class="ico">⚙</span></button>
+    </div>
+  </header>
+
+  <p class="tagline">One NFT collection a day. Six guesses.</p>
+
+  <div class="layout">
+
+    <!-- ── left rail: mode switcher ── -->
+    <aside class="col col-left">
+      <nav class="mode-list" id="mode-list" aria-label="Game modes"></nav>
+    </aside>
+
+    <!-- ── centre: the live game ── -->
+    <main class="col col-mid">
+      <section class="panel game-panel">
+        <div class="panel-bar">
+          <h2 class="panel-title" id="game-title">Day #1 · Classic</h2>
+          <span class="panel-badge" id="panel-badge">6/6</span>
+        </div>
+        <div class="panel-body">
+
+          <div id="stage" class="stage"></div>
+
+          <p class="game-meta" id="game-meta"></p>
+
+          <div class="input-wrap">
+            <input id="guess-input" type="text" autocomplete="off" autocapitalize="off"
+                   spellcheck="false" placeholder="Type a collection…" aria-label="Guess an NFT collection">
+            <button class="go-btn" id="btn-go" aria-label="Submit guess">→</button>
+            <div id="ac-list" class="ac-list hidden" role="listbox"></div>
+          </div>
+
+          <div id="pips" class="pips" aria-live="polite"></div>
+          <div id="hint-area" class="hint-area"></div>
+          <div id="clue-strip" class="clue-strip hidden"></div>
+
+          <div id="col-head" class="col-head hidden"></div>
+          <div id="board" class="board" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ── right rail: yesterday + rules ── -->
+    <aside class="col col-right">
+      <section class="panel">
+        <div class="panel-bar">
+          <h2 class="panel-title">Yesterday</h2>
+        </div>
+        <div class="panel-body" id="yesterday-body"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-bar">
+          <h2 class="panel-title">How to play</h2>
+        </div>
+        <div class="panel-body">
+          <ul class="rule-list">
+            <li><span class="tick" aria-hidden="true"></span> Six guesses a day</li>
+            <li><span class="tick" aria-hidden="true"></span> Three modes, three collections</li>
+            <li><span class="tick" aria-hidden="true"></span> Miss a day, lose the streak</li>
+          </ul>
+          <button class="degen-chip" id="btn-help-2">The long version</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- ── keep playing ── -->
+  <section class="more">
+    <h2 class="more-title">Keep playing</h2>
+    <div class="pill-row" id="pill-row"></div>
+    <p class="text-links">
+      <button data-go="stats">Stats</button><span>·</span>
+      <button data-go="board">Leaderboard</button><span>·</span>
+      <a href="https://www.coingecko.com/en/nft" target="_blank" rel="noopener">Data</a>
+    </p>
+    <div class="social-row" id="social-row"></div>
+    <p class="fineprint">An unofficial fan game · collection data via CoinGecko · floors are approximate</p>
+  </section>
+
+</div><!-- /.app -->
+
+<!-- the hang: real collection art, framed and dealt along the wall. Scenery. -->
+<div class="ground-layer" aria-hidden="true">
+  <div class="crowd" id="crowd">
+    <div class="crowd-row" data-band="0"></div>
+    <div class="crowd-row" data-band="1"></div>
+    <div class="crowd-row" data-band="2"></div>
+  </div>
+  <div class="ground"></div>
+</div>
+
+<!-- ===================== MODALS ===================== -->
+<div id="modal-help" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="help-h">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <h2 id="help-h">How to play</h2>
+    <p>A new collection every day in <strong>all three modes</strong>. Six guesses each. Miss a day and the streak dies.</p>
+    <div id="help-modes" class="help-modes"></div>
+    <h3>Classic feedback</h3>
+    <ul class="help-list">
+      <li><strong>Chain</strong> — where it lives. <span class="chip cy">Yellow</span> means both are EVM chains.</li>
+      <li><strong>Class</strong> — what the collection is: PFP, art, onchain, gaming… <span class="chip cy">Yellow</span> means same family.</li>
+      <li><strong>Year</strong> — the mint year. <span class="chip cy">Yellow</span> is within one year. ▲▼ point at the answer.</li>
+      <li><strong>Supply</strong> — how many items, by range (&le;100 · 100+ · 1K+ · 5K+ · 10K+).</li>
+      <li><strong>Floor</strong> — floor price today, by range (&lt;0.01Ξ · 0.01Ξ+ · 0.1Ξ+ · 1Ξ+ · 10Ξ+).</li>
+    </ul>
+    <div class="help-demo">
+      <div class="tile s-g demo"><span class="tile-val">Ethereum</span></div>
+      <div class="tile s-y demo"><span class="tile-val">PFP</span></div>
+      <div class="tile s-x demo"><span class="tile-val">2021</span><span class="tile-dir">▲</span></div>
+    </div>
+    <p class="demo-caption">exact · close · wrong</p>
+    <label class="cb-row"><input type="checkbox" id="cb-toggle"> High-contrast tiles (blue / orange)</label>
+  </div>
+</div>
+
+<div id="modal-settings" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="set-h">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <h2 id="set-h">Settings</h2>
+    <h3>Your handle</h3>
+    <div id="profile-body" class="profile-body"></div>
+    <label class="cb-row"><input type="checkbox" id="cb-toggle-2"> High-contrast tiles (blue / orange)</label>
+    <h3>Danger zone</h3>
+    <p class="fine">Wipes today's progress, your streak and every stat on this device. Your handle stays yours.</p>
+    <button class="btn btn-danger" id="btn-wipe">Erase my record</button>
+  </div>
+</div>
+
+<div id="modal-stats" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="stats-h">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <h2 id="stats-h">Your record</h2>
+    <div class="stat-tabs" id="stat-tabs"></div>
+    <div class="stat-grid">
+      <div class="stat"><span id="st-played" class="stat-num">0</span><span class="stat-label">played</span></div>
+      <div class="stat"><span id="st-winpct" class="stat-num">—</span><span class="stat-label">win rate</span></div>
+      <div class="stat"><span id="st-streak" class="stat-num">0</span><span class="stat-label">streak</span></div>
+      <div class="stat"><span id="st-max" class="stat-num">0</span><span class="stat-label">best</span></div>
+    </div>
+    <h3>Guess distribution</h3>
+    <div id="dist" class="dist"></div>
+  </div>
+</div>
+
+<div id="modal-archive" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="arch-h">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <h2 id="arch-h">Archive</h2>
+    <p class="fine">Every puzzle you've missed. Playing one won't touch your streak.</p>
+    <div id="archive-body" class="archive-body"></div>
+  </div>
+</div>
+
+<div id="modal-reveal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <div id="reveal-body"></div>
+  </div>
+</div>
+
+<div id="modal-gate" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="gate-h">
+  <div class="modal">
+    <h2 id="gate-h">Pick a handle</h2>
+    <div id="gate-body"></div>
+  </div>
+</div>
+
+<div id="modal-lb" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="lb-h">
+  <div class="modal">
+    <button class="modal-close" data-close aria-label="Close">✕</button>
+    <h2 id="lb-h">Leaderboard</h2>
+    <div id="lb-body"></div>
+  </div>
+</div>
+
+<div class="flash-layer" id="flash-layer" aria-live="polite"></div>
+
+<script src="data.js?v=c1edb881"></script>
+<script src="art.js?v=c1edb881"></script>
+<script src="lb.js?v=c1edb881"></script>
+<script src="share.js?v=c1edb881"></script>
+<script src="game.js?v=c1edb881"></script>
+</body>
+</html>

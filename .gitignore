@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.env
+.env.local
+.DS_Store
+
+.vercel
+.env*
+
+# caches for the asset tools — resumable intermediates, rebuildable, never shipped
+tools/.cg-cache.json
+tools/.os-slugs.json
