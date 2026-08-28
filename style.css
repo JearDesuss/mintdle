@@ -75,15 +75,22 @@
 
   /* Grade text sitting on a grade wash. Lightened so each clears 4.5:1 —
      the raw --miss on its own wash is only 3.96:1. */
-  --exact-ink: #35d96a;
-  --close-ink: #ffcc00;
-  --miss-ink: #f2808d;
+  --exact-ink: #5ee68a;
+  --close-ink: #ffc95c;
+  --miss-ink: #ff9aa5;
+
+  /* Solid tile grounds. Not a wash over the panel — explicit colours, chosen so
+     the amber lands amber instead of olive. Dark yellow over near-black goes
+     olive at any alpha, which was half the muddiness. */
+  --exact-tile: #0d3b1e;
+  --close-tile: #483001;
+  --miss-tile: #55222b;
   --blue-wash: rgba(7, 134, 255, .12);
 
   --font-display: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-body: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
   --font-ui: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
-  --font-mono: "Space Mono", ui-monospace, monospace;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, monospace;
 
   /* Type scale — DESIGN.md > Type. Nothing below 12px except --fs-label,
      which is mono + uppercase + .08em only. */
@@ -197,9 +204,12 @@
   --exact: #06771f;
   --close: #7a5c00;
   --miss: #c41e2a;
-  --exact-ink: #06771f;
-  --close-ink: #7a5c00;
-  --miss-ink: #c41e2a;
+  --exact-ink: #05601a;
+  --close-ink: #6b4f00;
+  --miss-ink: #a81824;
+  --exact-tile: #d3f0db;
+  --close-tile: #f4e7c2;
+  --miss-tile: #fbe1e4;
 
   --mint-wash: rgba(6, 119, 31, .12);
   --amber-wash: rgba(138, 104, 0, .12);
@@ -236,8 +246,10 @@
 body.cb {
   --bull: var(--blue-2);
   --bear: #ff914d;
-  --exact-ink: var(--blue-1);
-  --miss-ink: #ffb083;
+  --exact-ink: #8ecbff;
+  --miss-ink: #ffc09a;
+  --exact-tile: #06284a;
+  --miss-tile: #3d2408;
   --mint-wash: rgba(7, 134, 255, .16);
   --rose-wash: rgba(255, 145, 77, .16);
 }
@@ -245,8 +257,10 @@ body.cb {
 :root[data-theme="light"] body.cb {
   --bull: var(--blue-5);
   --bear: #9a4a00;
-  --exact-ink: var(--blue-5);
-  --miss-ink: #9a4a00;
+  --exact-ink: #04477f;
+  --miss-ink: #8a4200;
+  --exact-tile: #d9ebfb;
+  --miss-tile: #fae4d3;
   --mint-wash: rgba(5, 94, 179, .1);
   --rose-wash: rgba(154, 74, 0, .1);
 }
@@ -901,16 +915,17 @@ none;
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
-  padding: 6px 4px;
-  border: 1px solid var(--line-2);
+  padding: 7px 4px;
+  border: 1px solid transparent;
   border-radius: 6px;
+  background: var(--raise-1);
   text-align: center;
 }
 .tile-val { overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--fs-xs); font-weight: 500; line-height: 1.25; }
 .tile-dir { font-size: var(--fs-label); line-height: 1; }
-.s-g { color: var(--exact-ink); border-color: var(--bull); background: var(--mint-wash); }
-.s-y { color: var(--close-ink); border-color: var(--warn); background: var(--amber-wash); }
-.s-x { color: var(--miss-ink); border-color: var(--bear); background: var(--rose-wash); }
+.s-g { color: var(--exact-ink); border-color: transparent; background: var(--exact-tile); }
+.s-y { color: var(--close-ink); border-color: transparent; background: var(--close-tile); }
+.s-x { color: var(--miss-ink); border-color: transparent; background: var(--miss-tile); }
 .flip { animation: tile-flip 520ms var(--ease-spring) both; }
 @keyframes tile-flip { from { opacity: 0; transform: perspective(500px) rotateX(-82deg) translateY(-6px); } }
 .miss-row { display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 7px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--fill-1); animation: miss-in 300ms var(--ease-out) both; }

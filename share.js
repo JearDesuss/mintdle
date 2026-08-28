@@ -112,7 +112,7 @@ var SHARE = (function () {
       if (!document.fonts || !document.fonts.load) return Promise.resolve();
       var want = [
         '500 92px "Inter"',
-        '400 32px "Space Mono"',
+        '400 32px "Geist Mono"',
         '500 42px "Inter"',
         '400 26px "Inter"'
       ];
@@ -150,7 +150,7 @@ var SHARE = (function () {
       ? st.modeName + " · Endless"
       : st.modeName + " #" + st.day;
     text(ctx, label.toUpperCase(), padX + markW + 26, top + 56,
-      '400 28px "Space Mono", ui-monospace, monospace', C.ink2);
+      '400 28px "Geist Mono", ui-monospace, monospace', C.ink2);
 
     // ── the score, as a badge on the right ──
     var score = (st.won ? st.guesses : "X") + "/" + st.max;

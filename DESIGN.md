@@ -133,9 +133,19 @@ OpenSea's greys carry no hue at all.
 | `--close` | `#ffcc00` | near match |
 | `--wrong` | `#e24756` | miss, and destructive actions |
 
-Grades render as OpenSea renders status: an 8–16% wash of the colour, a 1px
-border in the colour, and the label in the colour. Not a solid candy fill, and
-never a gradient.
+Grades render as a **solid tile ground with the value in the grade ink** —
+`--exact-tile` / `--close-tile` / `--miss-tile`, no border. One signal, not
+four. The earlier revision encoded each grade in a border colour *and* a wash
+*and* a text colour *and* an arrow; that redundancy is what made the board look
+generated, and the 1px saturated outlines on every cell are what made it loud.
+
+Two rules the tile colours must keep:
+
+- **The three grounds are matched on luminance** (dark ≈ 0.033, light ≈ 0.805),
+  so no grade carries more visual weight than another.
+- **The amber is not a yellow wash.** Dark yellow over near-black goes olive at
+  any alpha, which is why `--close-tile` is an explicit `#483001` rather than a
+  percentage of `--close`. Never render a grade as an alpha of its own colour.
 
 `--legendary #ff8a00`, `--epic #d358ff`, `--rare #00a3ff`, `--common #898a8c`
 exist for collection rarity only. They are not UI colours and never appear on
@@ -147,10 +157,16 @@ tonal steps and 1px borders. Artwork carries every other colour on the page.
 ## Type
 
 **Inter** — 400 and 500 only. Load exactly those two weights.
-**Space Mono** — labels, counters, floors, chains, supply, and other market
-metadata. Uppercase. Never display, never body copy, never a button.
+**Geist Mono** — 400 and 500. Board values, labels, counters, floors, chains,
+supply, and other market metadata. Never display, never body copy, never a
+button. OpenSea's kit uses mono for numeric data too (`AnimatedNumber`, chart
+axes, `Countdown`), so mono on the values is right — but it must be a *data*
+mono. Space Mono, which this replaced, is a display face with splayed slab
+terminals and a very wide fixed advance; at 12px in a dense grid it stretched
+values out and read cheap.
 
 Substitute for Inter: `-apple-system, "Segoe UI", system-ui, sans-serif`.
+Substitute for Geist Mono: `ui-monospace, SFMono-Regular, monospace`.
 
 | role | size | weight | line-height |
 |---|---:|---:|---|
@@ -251,9 +267,10 @@ The `/` shortcut does the same. There are no dead marketplace controls.
 
 ### Status and grade tiles
 
-Wash + border + text in the grade colour, per the palette section. The
-high-contrast setting swaps green/amber for blue/orange and is the only case
-where blue appears on a grade.
+Solid tile ground, no border, value in the grade ink, per the palette section.
+The ungraded cell is a flat `--raise-1`. The high-contrast setting swaps
+green/amber for blue/orange — it overrides the tile ground as well as the ink,
+in both themes — and is the only case where blue appears on a grade.
 
 ### Modals
 
