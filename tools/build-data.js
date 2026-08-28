@@ -21,12 +21,15 @@ const CHAIN = {
 
 // Fame, not age — see the note on fameWeight in game.js. A collection nobody
 // can name is a bad puzzle no matter how recently it minted.
+// The roster is culled to famous collections only (tools/cull.js), so an absent
+// rank no longer means obscure — CoinGecko simply does not track Nouns, Ringers,
+// Checks, Loot, CrypToadz or Runestone. Anything still on the list earned its
+// place, so an untracked entry sits mid-table rather than last.
 function fame(rank) {
-  if (!rank) return 1;
+  if (!rank) return 2.5;
   if (rank <= 30) return 4;
   if (rank <= 80) return 2.5;
-  if (rank <= 200) return 1.5;
-  return 1;
+  return 1.5;
 }
 const r2 = n => Math.round(n * 100) / 100;
 const r4 = n => Math.round(n * 10000) / 10000;

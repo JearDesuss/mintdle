@@ -12,3 +12,4 @@ dist/
 # rather than re-priced), and the second records which OpenSea slug guesses
 # resolved. Together they save a ~30 minute rate-limited refetch on a fresh
 # clone. They are inputs to a build, not build output.
+tools/.rank-cache.json
