@@ -21,21 +21,22 @@ var SHARE = (function () {
 
   // The page's midnight-market tokens, at print scale.
   var C = {
-    ink: "#F7FAFF",
-    ink2: "#94A7C1",
-    paper: "#0E1C30",
-    card: "#14243B",
-    rind: "#31445F",
-    ash: "#667B99",
-    gold: "#2081E2",
-    sky1: "#07111F",
-    sky2: "#0B1830",
-    shadow: "#020813",
-    bull: "#35D39A",
-    warn: "#F1B84B",
-    bear: "#EF6178"
+    ink: "#FFFFFF",     // --text-1
+    ink2: "#ACADAE",    // --text-2
+    paper: "#101011",   // --app
+    card: "#141415",    // --surface-1
+    rind: "#34353C",    // --line-2
+    ash: "#898A8C",     // --contrast-1
+    gold: "#0786FF",    // --blue-3, the action blue
+    sky1: "#101011",    // --app
+    sky2: "#141415",    // --surface-1
+    shadow: "#000000",
+    bull: "#0FBE39",    // --exact
+    warn: "#FFCC00",    // --close
+    bear: "#E24756"     // --miss
   };
-  var CB = { bull: "#2F6FD0", bear: "#D9721B" };
+  // High-contrast tiles, matching body.cb in style.css.
+  var CB = { bull: "#2092FF", bear: "#FF914D" };
 
   var CUT = 2;
   var CUT_IN = 2;
@@ -92,11 +93,11 @@ var SHARE = (function () {
   }
 
   function wordmark(ctx, x, y, size) {
-    ctx.font = "800 " + size + 'px "Inter", "Segoe UI", system-ui, sans-serif';
+    ctx.font = "500 " + size + 'px "Inter", "Segoe UI", system-ui, sans-serif';
     ctx.textAlign = "left";
     ctx.textBaseline = "alphabetic";
     ctx.lineJoin = "round";
-    ctx.fillStyle = C.gold;
+    ctx.fillStyle = C.ink;
     ctx.fillText("mintdle", x, y);
     return ctx.measureText("mintdle").width;
   }
@@ -110,9 +111,9 @@ var SHARE = (function () {
     fontsReady = (function () {
       if (!document.fonts || !document.fonts.load) return Promise.resolve();
       var want = [
-        '800 92px "Inter"',
-        '700 32px "Space Mono"',
-        '700 42px "Inter"',
+        '500 92px "Inter"',
+        '400 32px "Space Mono"',
+        '500 42px "Inter"',
         '400 26px "Inter"'
       ];
       return Promise.all(want.map(function (f) {
@@ -149,16 +150,17 @@ var SHARE = (function () {
       ? st.modeName + " · Endless"
       : st.modeName + " #" + st.day;
     text(ctx, label.toUpperCase(), padX + markW + 26, top + 56,
-      '700 28px "Space Mono", ui-monospace, monospace', C.ink2);
+      '400 28px "Space Mono", ui-monospace, monospace', C.ink2);
 
     // ── the score, as a badge on the right ──
     var score = (st.won ? st.guesses : "X") + "/" + st.max;
-    ctx.font = '700 50px "Inter", "Segoe UI", system-ui, sans-serif';
+    ctx.font = '500 50px "Inter", "Segoe UI", system-ui, sans-serif';
     var sw = Math.max(132, ctx.measureText(score).width + 56);
     var sx = px + pw - 52 - sw;
-    sticker(ctx, sx, top + 2, sw, 76, R_TILE, st.won ? C.gold : C.card, CUT_IN, 5);
+    sticker(ctx, sx, top + 2, sw, 76, R_TILE, st.won ? C.bull : C.card, CUT_IN, 5);
     text(ctx, score, sx + sw / 2, top + 58,
-      '700 50px "Inter", "Segoe UI", system-ui, sans-serif', C.ink, "center");
+      '500 50px "Inter", "Segoe UI", system-ui, sans-serif',
+      st.won ? "#04120a" : C.ink, "center");
 
     if (st.blurb) {
       text(ctx, st.blurb, padX, top + 106,
@@ -180,7 +182,7 @@ var SHARE = (function () {
     ctx.stroke();
 
     text(ctx, st.url, padX, footY,
-      '700 30px "Inter", "Segoe UI", system-ui, sans-serif', C.ink);
+      '500 30px "Inter", "Segoe UI", system-ui, sans-serif', C.ink);
 
     var right = [];
     if (st.hint) right.push("hint spent");

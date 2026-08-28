@@ -13,7 +13,18 @@
 Neutral charcoal — never navy. The room is grey and unlit; the only colour in it
 is the NFT art and one blue that means *you can act on this*. Mintdle is an NFT
 game, so the collection artwork is the inventory, not background flavour. The
-interface stays dark and information-dense and gets out of the way.
+interface stays information-dense and gets out of the way.
+
+Dark is the house theme and the one the product is designed in. A light theme
+ships alongside it, from OpenSea's own published `.light` tokens, and the room
+simply changes from an unlit desk to a daylit one — the same restraint, the same
+single blue, the same artwork carrying all the colour.
+
+Dark is also the **default**. `prefers-color-scheme` no longer reports
+`no-preference` — browsers answer `light` when the OS says nothing — so
+following the OS by default would flip every existing player on a
+light-preferring machine to a white site they never asked for. "System" is an
+explicit opt-in in Settings, alongside Light and Dark.
 
 The signature is the popular-collection field: real artwork already shipped in
 `img/` — CryptoPunks, BAYC, Pudgy Penguins, Azuki, Milady, Doodles, Moonbirds,
@@ -51,6 +62,25 @@ previous revision had 25 gradients, including a literal
 
 **3. Blue is never a grade and never decoration.** Blue means *actionable*.
 Green, amber and red mean exact, close and wrong. A blue `6/6` counter is a bug.
+
+## Themes
+
+Two themes, one vocabulary. Every colour below is a token; components never
+name a theme. Dark values sit on `:root`, light values on
+`:root[data-theme="light"]`, and an inline script in `index.html` stamps the
+attribute before the stylesheet lands so a dark load never flashes white.
+
+Two rules make the difference between a theme and an inversion:
+
+- **Component fills are translucent in dark and solid in light** — `--fill-1..3`.
+  A 3.5% white wash reads as a card on charcoal and as nothing at all on white.
+  This is exactly how OpenSea's own `*-transparent` tokens behave.
+- **The grades are not the same colours in both themes.** OpenSea's published
+  light semantics are meant as fills and borders, not as text on a tint:
+  `success-2 #03bc31` is 2.15:1 on a 16% wash over white, and even their darkest
+  published green is 3.17:1. Light uses `#06771f` / `#8a6800` / `#c41e2a`, each
+  verified as ink. Likewise `--quiet` follows `--contrast-1` in dark but
+  `--text-2` in light, because `#8f8f8f` is 3.23:1 on white.
 
 ## Palette
 
@@ -129,14 +159,15 @@ Substitute for Inter: `-apple-system, "Segoe UI", system-ui, sans-serif`.
 | heading-lg | 32px | 500 | 1.25 |
 | heading-md | 24px | 500 | 1.25 |
 | heading-sm | 20px | 500 | 1.25 |
-| heading-xs | 18px | 500 | 1.25 |
+| heading-xs | 18px | 400 | 1.35 |
 | body-md | 16px | 400 | 1.5 |
 | body-sm | 14px | 400 | 1.5 |
 | body-xs | 12px | 400 | 1.5 |
 | label | 10px | 400 | 1.25 · mono · uppercase · `.08em` |
 
-Tracking tightens as size grows: `-0.02em` at 32px and above, `-0.01em` at
-20–24px, normal below.
+Tracking tightens as size grows: `-0.045em` at 48px, `-0.035em` at 32px,
+`-0.02em` at 24px, `-0.01em` at 20px, normal at 18px and below. Every size is a
+`--fs-*` token; a raw `px` font-size in a component is a bug.
 
 The working UI stays dense: 12–14px for most product text, 20–24px section
 heads, and 48px only for the featured daily headline. The hero is 48px at
@@ -251,7 +282,9 @@ Durations 200ms for colour, 450ms for layout, `--ease-out cubic-bezier(0,0,.58,1
 
 ## Accessibility and UX rules
 
-- Keyboard focus uses a visible 2px `--blue-1` ring at 2px offset.
+- Keyboard focus uses a visible 2px ring at 2px offset in `--accent-text`,
+  which is `--blue-1` in dark and `--blue-5` in light. `--blue-3` is only
+  3.58:1 on white and must never carry small text or a focus ring there.
 - `/` focuses the game search; Escape closes dialogs.
 - Mobile hit targets stay at least 40px.
 - The game board may scroll horizontally on narrow screens rather than crush

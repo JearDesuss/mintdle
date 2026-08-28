@@ -247,12 +247,10 @@
     var ch = (key || "?").charAt(0).toUpperCase();
     var svg =
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">' +
-      '<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop stop-color="#1A2C46"/><stop offset="1" stop-color="#0A1627"/></linearGradient></defs>' +
-      '<rect width="64" height="64" rx="13" fill="url(#g)"/>' +
-      '<rect x="5.5" y="5.5" width="53" height="53" rx="10" fill="none" stroke="#31445F"/>' +
+      '<rect width="64" height="64" rx="12" fill="#1b1d1f"/>' +
+      '<rect x="5.5" y="5.5" width="53" height="53" rx="6" fill="none" stroke="#26272d"/>' +
       '<text x="32" y="42" text-anchor="middle" font-family="ui-monospace,monospace" ' +
-      'font-weight="700" font-size="24" fill="#6BDCFF">' + ch + "</text></svg>";
+      'font-weight="500" font-size="24" fill="#acadae">' + ch + "</text></svg>";
     return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
   }
   function artFile(key) { return (typeof ART !== "undefined" && ART[key]) || null; }
@@ -274,18 +272,27 @@
     return img;
   }
 
-  // ──────────────── brand: marketplace portal + wordmark ────────────────
+  // ──────────────── brand: the tab icon, at wordmark scale ────────────────
+  // The mark is the favicon, verbatim — the same 64-unit rounded square and the
+  // same white M path index.html carries in <link rel="icon"> — so the tab and
+  // the topbar are one object instead of two logos for one product. Flat
+  // --blue-3, no defs, no gradient, no navy inner tile.
+  //
+  // The wordmark is fill="currentColor", so it inherits colour from body and is
+  // correct in light and dark with no second asset. textLength locks the word to
+  // 138 units: against Inter's natural ~143 that lands near -0.02em, the tracking
+  // DESIGN.md specifies at 32px and up, and it guarantees the word cannot outgrow
+  // the viewBox before Inter has loaded.
+  //
+  // sfx is unused now — it only existed to keep the removed gradient's id unique.
+  // Kept so the call site does not have to change.
   function brandSVG(sfx) {
-    return '<svg viewBox="0 0 420 96" role="img" aria-label="Mintdle">' +
-      '<defs><linearGradient id="mintdle-mark-' + sfx + '" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop stop-color="#6BDCFF"/><stop offset=".48" stop-color="#2081E2"/>' +
-      '<stop offset="1" stop-color="#9B7BFF"/></linearGradient></defs>' +
-      '<rect x="4" y="14" width="66" height="66" rx="19" fill="url(#mintdle-mark-' + sfx + ')"/>' +
-      '<rect x="13" y="23" width="48" height="48" rx="13" fill="#0A1627" fill-opacity=".9"/>' +
-      '<path d="M22 60V34h7l8 11 8-11h7v26h-8V47l-7 9-7-9v13z" fill="#F7FAFF"/>' +
-      '<text x="84" y="64" font-family="Inter,Segoe UI,sans-serif" font-size="48" ' +
-      'font-weight="800" letter-spacing="-2.4" fill="#F7FAFF">mintdle</text>' +
-      '<circle cx="393" cy="30" r="5" fill="#35D39A"/></svg>';
+    return '<svg viewBox="0 0 236 64" role="img" aria-label="Mintdle">' +
+      '<rect width="64" height="64" rx="16" fill="#0786ff"/>' +
+      '<path d="M17 43V20h6l9 12 9-12h6v23h-7V31l-8 10-8-10v12z" fill="#ffffff"/>' +
+      '<text x="84" y="46.5" textLength="138" font-size="40" font-weight="500" ' +
+      'font-family="Inter,-apple-system,Segoe UI,system-ui,sans-serif" ' +
+      'fill="currentColor">mintdle</text></svg>';
   }
 
   // ──────────────── clouds: outlined pixel blocks ────────────────
@@ -703,7 +710,7 @@
       if (reducedMotion()) return;
       var cv = $("confetti"), ctx = cv.getContext("2d");
       cv.width = window.innerWidth; cv.height = window.innerHeight;
-      var colors = ["#4FD16B", "#FFD93B", "#FF7BC4", "#B08BF0", "#F4635A"];
+      var colors = ["#0fbe39", "#ffcc00", "#e24756", "#0786ff", "#83c3ff"];
       var parts = [];
       for (var i = 0; i < 96; i++) {
         parts.push({
@@ -723,7 +730,7 @@
           ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.r);
           ctx.fillStyle = p.c;
           ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
-          ctx.strokeStyle = "#2B2C4B"; ctx.lineWidth = 2;
+          ctx.strokeStyle = "rgba(0, 0, 0, .35)"; ctx.lineWidth = 2;
           ctx.strokeRect(-p.w / 2, -p.h / 2, p.w, p.h);
           ctx.restore();
         });
@@ -1215,6 +1222,45 @@
     });
   }
 
+  // ──────────────── theme ────────────────
+  // The attribute lives on <html>, not <body>: the inline script in index.html
+  // stamps it before first paint, so a dark load never flashes white. Dark is
+  // the house theme AND the default — "system" is an explicit opt-in, because
+  // prefers-color-scheme no longer reports "no-preference" and defaulting to it
+  // would flip existing players to light unasked.
+  var THEME_KEY = "mt_theme";
+  var themeQuery = window.matchMedia ? matchMedia("(prefers-color-scheme: light)") : null;
+
+  function themePref() {
+    var t = lsGet(THEME_KEY);
+    return (t === "light" || t === "system") ? t : "dark";
+  }
+  function applyTheme() {
+    var pref = themePref();
+    var dark = pref === "dark" || (pref === "system" && !(themeQuery && themeQuery.matches));
+    document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", dark ? "#101011" : "#fafafa");
+    Array.prototype.forEach.call(document.querySelectorAll("[data-theme-set]"), function (b) {
+      var on = b.getAttribute("data-theme-set") === pref;
+      b.classList.toggle("on", on);
+      b.setAttribute("aria-pressed", on ? "true" : "false");
+    });
+  }
+  function bindTheme() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-theme-set]"), function (b) {
+      b.addEventListener("click", function () {
+        lsSet(THEME_KEY, b.getAttribute("data-theme-set"));
+        applyTheme();
+      });
+    });
+    if (themeQuery) {
+      if (themeQuery.addEventListener) themeQuery.addEventListener("change", applyTheme);
+      else if (themeQuery.addListener) themeQuery.addListener(applyTheme);  // Safari < 14
+    }
+    applyTheme();
+  }
+
   function init() {
     $("brand-slot").innerHTML = brandSVG("a");
     renderHelpModes(); renderSocial();
@@ -1267,6 +1313,7 @@
 
     bindToggle($("cb-toggle"), "cb", "mt_cb");
     bindToggle($("cb-toggle-2"), "cb", "mt_cb");
+    bindTheme();
 
     $("btn-wipe").addEventListener("click", function () {
       var b = $("btn-wipe");
@@ -1277,7 +1324,7 @@
         return;
       }
       try {
-        var keep = { mt_cid: 1, mt_name: 1, mt_x: 1 };
+        var keep = { mt_cid: 1, mt_name: 1, mt_x: 1, mt_theme: 1 };
         var kill = [];
         for (var i = 0; i < localStorage.length; i++) {
           var k = localStorage.key(i);
