@@ -17,6 +17,19 @@
 //
 // Near-duplicates are also dropped: a board that can answer either "DeGods" or
 // "DeGods (Solana)" is an unfair puzzle, not a richer one.
+//
+// DO NOT ADD A VOLUME FLOOR. It is the obvious filter and it is wrong here,
+// measured rather than assumed: 25 of the 72 survivors trade under $500 in 24h,
+// and Autoglyphs, Fidenza, Chromie Squiggle, Ringers, Nouns, Loot and CrypToadz
+// all sit at exactly $0. Scarce blue-chip art barely trades BECAUSE it is
+// scarce. A $2,000 volume floor deletes the most famous collections on the list.
+// Volume is kept in .rank-cache.json as evidence, and used for nothing.
+//
+// Where rank and volume disagree, rank wins. Courtyard.io turns over $355k/24h
+// — the most of anything here — on a $5 floor, because it is a wrapper around
+// graded physical cards rather than a collection with an identity to guess.
+// Cash Cats and BEARISH out-trade Hypurr, which is kept, but they rank 79 and
+// 82 against its 5. The line is top-of-market significance, not turnover.
 const fs = require('fs'), path = require('path');
 const T = __dirname;
 const roster = JSON.parse(fs.readFileSync(path.join(T, 'roster.json'), 'utf8'));
